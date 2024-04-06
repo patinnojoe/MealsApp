@@ -1,8 +1,11 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useContext, useLayoutEffect, useState } from 'react';
 import { Text, View, Image, StyleSheet, ScrollView, Button } from 'react-native';
 import { MEALS } from '../data/dummy-data';
 import { IconButton } from '../components';
+// import { FavoriteContext } from '../store/context/favorite-context';
+import { useDispatch, useSelector } from 'react-redux';
+import { favoriteAction } from '../store/redux/favoriteSlice';
 
 function MealDetailScreen() {
   const route = useRoute();
@@ -10,10 +13,27 @@ function MealDetailScreen() {
   const selectedMeal = MEALS.find((meal) => meal.id == mealID);
   const selectedMealTile = selectedMeal.title;
   const navigation = useNavigation();
-  const [isFavorite, setFavorite] = useState(false);
+  // const [isFavorite, setFavorite] = useState(false);
 
+  // get the favorite context through the use context hook
+  // const favoriteMealContext = useContext(FavoriteContext);
+  const dispatch = useDispatch();
+
+  // check if the meal is in the favorite ids
+  // let isFavorite = favoriteMealContext.ids.includes(mealID);
+
+  let isFavorite = useSelector((state) => state.favoriteReducer.ids.includes(mealID));
+  // if favorite meal ids, includes the meal id, it returns true else it returns false
   const handleFavorite = () => {
-    setFavorite((prev) => !prev);
+    // check if meal is favorite, if it is, remove meal as favorite
+
+    if (isFavorite) {
+      // favoriteMealContext.removeFavorite(mealID);
+      dispatch(favoriteAction.removeFavorite({ id: mealID }));
+    } else {
+      // favoriteMealContext.addFavorite(mealID);
+      dispatch(favoriteAction.addFavorite({ id: mealID }));
+    }
   };
 
   useLayoutEffect(() => {
